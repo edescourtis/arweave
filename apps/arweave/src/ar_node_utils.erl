@@ -331,6 +331,22 @@ integrate_new_block(
 		BlockTXs
 	),
 	BH = element(1, hd(NewBI)),
+	pg2:create(new_block_notifications),
+	NewBlockNotificationMembers = pg2:get_members(new_block_notifications),
+	spawn(fun () ->
+					[begin P ! #{
+						block_index      => NewBI,
+						current          => BH,
+						txs              => ValidTXs,
+						height           => NewB#block.height,
+						reward_pool      => NewB#block.reward_pool,
+						diff             => NewB#block.diff,
+						last_retarget    => NewB#block.last_retarget,
+						weave_size       => NewB#block.weave_size,
+						block_txs_pairs  => NewBlockTXPairs,
+						mempool_size     => calculate_mempool_size(ValidTXs)
+					} end || P <- NewBlockNotificationMembers]
+				end),
 	reset_miner(StateIn#{
 		block_index      => NewBI,
 		current          => BH,

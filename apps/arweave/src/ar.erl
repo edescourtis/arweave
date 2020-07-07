@@ -317,6 +317,8 @@ start(
 		max_disk_pool_buffer_mb = MaxDiskPoolBuffer,
 		max_disk_pool_data_root_buffer_mb = MaxDiskPoolDataRootBuffer
 	}) ->
+	%% Start external mining interface
+	spawn(fun () -> ar_external_mining:start() end),
 	%% Start the logging system.
 	filelib:ensure_dir(?LOG_DIR ++ "/"),
 	error_logger:logfile({open, Filename = generate_logfile_name()}),
